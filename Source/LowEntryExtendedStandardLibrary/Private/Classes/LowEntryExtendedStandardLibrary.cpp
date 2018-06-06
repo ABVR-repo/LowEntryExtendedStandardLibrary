@@ -1,3 +1,5 @@
+// Copyright Low Entry. Apache License, Version 2.0.
+
 #include "LowEntryExtendedStandardLibrary.h"
 
 #include "LowEntryHashingBCryptLibrary.h"
@@ -257,6 +259,15 @@ bool ULowEntryExtendedStandardLibrary::Ps4Platform()
 bool ULowEntryExtendedStandardLibrary::XboxOnePlatform()
 {
 #if PLATFORM_XBOXONE
+	return true;
+#else
+	return false;
+#endif
+}
+
+bool ULowEntryExtendedStandardLibrary::SwitchPlatform()
+{
+#if PLATFORM_SWITCH
 	return true;
 #else
 	return false;
@@ -1482,18 +1493,7 @@ UTexture2D* ULowEntryExtendedStandardLibrary::BytesToImage(const TArray<uint8>& 
 		return NULL;
 	}
 
-	UTexture2D* LoadedT2D = UTexture2D::CreateTransient(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), EPixelFormat::PF_B8G8R8A8);
-	if(LoadedT2D == nullptr)
-	{
-		return NULL;
-	}
-
-	void* TextureData = LoadedT2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-	FMemory::Memcpy(TextureData, Uncompressed->GetData(), Uncompressed->Num());
-	LoadedT2D->PlatformData->Mips[0].BulkData.Unlock();
-
-	LoadedT2D->UpdateResource();
-	return LoadedT2D;
+	return ULowEntryExtendedStandardLibrary::DataToTexture2D(ImageWrapper->GetWidth(), ImageWrapper->GetHeight(), Uncompressed->GetData(), Uncompressed->Num());
 }
 
 void ULowEntryExtendedStandardLibrary::Texture2DToBytes(UTexture2D* Texture2D, const ELowEntryImageFormat ImageFormat, TArray<uint8>& ByteArray, const int32 CompressionQuality)
@@ -1806,15 +1806,22 @@ UTexture2D* ULowEntryExtendedStandardLibrary::PixelsToTexture2D(const int32 Widt
 	{
 		return NULL;
 	}
+	return ULowEntryExtendedStandardLibrary::DataToTexture2D(Width, Height, &Pixels[0], Pixels.Num() * sizeof(FColor));
+}
 
+
+
+UTexture2D* ULowEntryExtendedStandardLibrary::DataToTexture2D(int32 Width, int32 Height, const void* Src, SIZE_T Count)
+{
 	UTexture2D* LoadedT2D = UTexture2D::CreateTransient(Width, Height, EPixelFormat::PF_B8G8R8A8);
 	if(LoadedT2D == nullptr)
 	{
 		return NULL;
 	}
+	LoadedT2D->bNoTiling = true;
 
 	void* TextureData = LoadedT2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
-	FMemory::Memcpy(TextureData, &Pixels[0], Pixels.Num() * sizeof(FColor));
+	FMemory::Memcpy(TextureData, Src, Count);
 	LoadedT2D->PlatformData->Mips[0].BulkData.Unlock();
 
 	LoadedT2D->UpdateResource();
@@ -1937,12 +1944,11 @@ void ULowEntryExtendedStandardLibrary::TextureRenderTarget2DToPixels(UTextureRen
 
 
 
-void ULowEntryExtendedStandardLibrary::LoadVideo(const FString& Url, bool& Success, UMediaPlayer*& Player, UMediaTexture*& Texture, UMediaSoundComponent*& Sound, const bool PlayOnOpen, const bool Loop)
+void ULowEntryExtendedStandardLibrary::LoadVideo(UMediaSoundComponent* MediaSoundComponent, const FString& Url, bool& Success, UMediaPlayer*& Player, UMediaTexture*& Texture, const bool PlayOnOpen, const bool Loop)
 {
 	Success = false;
 	Player = NULL;
 	Texture = NULL;
-	Sound = NULL;
 
 	UMediaPlayer* LoadPlayer = NewObject<UMediaPlayer>();
 	if(!LoadPlayer->OpenUrl(Url))
@@ -1954,14 +1960,16 @@ void ULowEntryExtendedStandardLibrary::LoadVideo(const FString& Url, bool& Succe
 
 	Player = LoadPlayer;
 	Player->SetLooping(Loop);
+	Player->PlayOnOpen = PlayOnOpen;
 
 	Texture = NewObject<UMediaTexture>();
-	Sound = NewObject<UMediaSoundComponent>();
-
-	Player->PlayOnOpen = PlayOnOpen;
-	Texture->MediaPlayer = Player;
-	Sound->MediaPlayer = Player;
+	Texture->SetMediaPlayer(Player);
 	Texture->UpdateResource();
+
+	if(MediaSoundComponent != nullptr)
+	{
+		MediaSoundComponent->SetMediaPlayer(Player);
+	}
 }
 
 

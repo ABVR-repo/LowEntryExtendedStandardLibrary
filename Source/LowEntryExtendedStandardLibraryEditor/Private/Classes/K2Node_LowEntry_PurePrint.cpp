@@ -1,3 +1,5 @@
+// Copyright Low Entry. Apache License, Version 2.0.
+
 #include "K2Node_LowEntry_PurePrint.h"
 
 #include "LowEntryExtendedStandardLibrary.h"
@@ -127,13 +129,13 @@ void UK2Node_LowEntry_PurePrint::AllocateDefaultPins()
 {
 	if(!true)
 	{
-		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, TEXT(""), NULL, false, false, UEdGraphSchema_K2::PN_Execute);
-		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, TEXT(""), NULL, false, false, UEdGraphSchema_K2::PN_Then);
+		CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Exec, TEXT(""), NULL, UEdGraphSchema_K2::PN_Execute);
+		CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Exec, TEXT(""), NULL, UEdGraphSchema_K2::PN_Then);
 	}
 
-	UEdGraphPin* InputPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, TEXT(""), NULL, false, false, TEXT("Value"));
-	UEdGraphPin* StringInputPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_String, TEXT(""), NULL, false, false, TEXT("Message"));
-	UEdGraphPin* OutputPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, TEXT(""), NULL, false, false, TEXT("Value "));
+	UEdGraphPin* InputPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_Wildcard, TEXT(""), NULL, TEXT("Value"));
+	UEdGraphPin* StringInputPin = CreatePin(EGPD_Input, UEdGraphSchema_K2::PC_String, TEXT(""), NULL, TEXT("Message"));
+	UEdGraphPin* OutputPin = CreatePin(EGPD_Output, UEdGraphSchema_K2::PC_Wildcard, TEXT(""), NULL, TEXT("Value "));
 }
 
 void UK2Node_LowEntry_PurePrint::NotifyPinConnectionListChanged(UEdGraphPin* Pin)
