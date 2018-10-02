@@ -753,6 +753,16 @@ public:
 		static UTexture2D* BytesToImage(const TArray<uint8>& ByteArray, const ELowEntryImageFormat ImageFormat, int32 Index = 0, int32 Length = 0x7FFFFFFF);
 
 	/**
+	* Converts a Byte Array into an image (Texture2D).
+	*
+	* Returns NULL if it fails.
+	* 
+	* Will re-use the given Texture2D if possible, ReusedGivenTexture2D will be true if it was possible.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Encoding|From Bytes", Meta = (DisplayName = "Bytes To Existing Image (Texture2D)", Keywords = "byte array binary", AdvancedDisplay = "4"))
+		static UTexture2D* BytesToExistingImage(bool& ReusedGivenTexture2D, UTexture2D* Texture2D, const TArray<uint8>& ByteArray, const ELowEntryImageFormat ImageFormat, int32 Index = 0, int32 Length = 0x7FFFFFFF);
+
+	/**
 	* Converts a Texture2D into a Byte Array.
 	*
 	* Some formats will not work (like BMP, ICO and ICNS).
@@ -802,8 +812,19 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Image|From Pixels", Meta = (DisplayName = "Pixels To Image (Texture2D)", Keywords = "array width height pixels colors"))
 		static UTexture2D* PixelsToTexture2D(const int32 Width, const int32 Height, const TArray<FColor>& Pixels);
 
+	/**
+	* Converts a Pixel Array into an image (Texture2D).
+	*
+	* Returns NULL if it fails.
+	* 
+	* Will re-use the given Texture2D if possible, ReusedGivenTexture2D will be true if it was possible.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Image|From Pixels", Meta = (DisplayName = "Pixels To Existing Image (Texture2D)", Keywords = "array width height pixels colors"))
+		static UTexture2D* PixelsToExistingTexture2D(bool& ReusedGivenTexture2D, UTexture2D* Texture2D, const int32 Width, const int32 Height, const TArray<FColor>& Pixels);
+
 
 	static UTexture2D* DataToTexture2D(int32 Width, int32 Height, const void* Src, SIZE_T Count);
+	static UTexture2D* DataToExistingTexture2D(UTexture2D* Texture2D, int32 Width, int32 Height, const void* Src, SIZE_T Count);
 
 
 	/**
@@ -2288,13 +2309,13 @@ public:
 
 
 	/**
-	* Sets the mouse position.
+	* Sets the mouse position (relative to the viewport).
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Utilities|Mouse", Meta = (DisplayName = "Set Mouse Position"))
 		static void SetMousePosition(const int32 X, const int32 Y);
 
 	/**
-	* Returns the mouse position.
+	* Returns the mouse position (relative to the viewport), from 0 to the viewport width or height.
 	* 
 	* Returns Success=false, X=0 and Y=0 if the mouse position could not be determined, which happends when:
 	*  - GEngine is null
@@ -2307,7 +2328,7 @@ public:
 
 
 	/**
-	* Sets the mouse position in percentages, from 0.0 to 1.0.
+	* Sets the mouse position (relative to the viewport) in percentages, from 0.0 to 1.0.
 	* 
 	* X:  0.0 is left, 1.0 is right
 	* Y:  0.0 is top,  1.0 is bottom
@@ -2316,7 +2337,7 @@ public:
 		static void SetMousePositionInPercentages(const float X, const float Y);
 
 	/**
-	* Returns the mouse position in percentages, from 0.0 to 1.0.
+	* Returns the mouse position (relative to the viewport) in percentages, from 0.0 to 1.0.
 	* 
 	* X:  0.0 is left, 1.0 is right
 	* Y:  0.0 is top,  1.0 is bottom
@@ -2610,6 +2631,18 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Utilities|Other", Meta = (DisplayName = "Case Switch Object", ExpandEnumAsExecs = "Branch"))
 		static void CaseSwitchObject(const int32 OnlyCheckFirstX, const UObject* Value, const UObject* _1__, const UObject* _2__, const UObject* _3__, const UObject* _4__, const UObject* _5__, const UObject* _6__, const UObject* _7__, const UObject* _8__, const UObject* _9__, const UObject* _10__, ELowEntryExtendedStandardLibrary1to10other& Branch);
+
+
+
+	/**
+	* Returns the LocalPlayer from the given PlayerController.
+	*
+	* Fails if the PlayerController isn't owned by a LocalPlayer (but by a networked player instead).
+	*
+	* Description of a LocalPlayer: Each player that is active on the current client has a LocalPlayer. It stays active across maps There may be several spawned in the case of splitscreen/coop. There may be 0 spawned on servers. See http://api.unrealengine.com/INT/API/Runtime/Engine/Engine/ULocalPlayer/index.html
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Utilities|Gameplay", Meta = (DisplayName = "Get Local Player"))
+		static void PlayerControllerGetLocalPlayer(APlayerController* PlayerController, bool& Success, ULocalPlayer*& LocalPlayer);
 
 
 
