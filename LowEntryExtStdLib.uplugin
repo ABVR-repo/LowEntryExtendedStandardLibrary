@@ -10,6 +10,7 @@
     "Description": "The Extended Standard Library plugin provides you with blueprints that add a lot of functionality and improvements to the blueprint scripting language.",
     "Category": "Low Entry.Plugins",
     "EnabledByDefault": true,
+	"Installed": true,
     "Modules": [
         {
             "Name": "LowEntryExtendedStandardLibrary",
