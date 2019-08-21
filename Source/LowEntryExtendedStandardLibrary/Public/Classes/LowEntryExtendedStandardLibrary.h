@@ -794,6 +794,23 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Encoding|To Bytes", Meta = (DisplayName = "Pixels To Bytes", Keywords = "byte binary array width height pixels colors", AdvancedDisplay = "5"))
 		static void PixelsToBytes(const int32 Width, const int32 Height, const TArray<FColor>& Pixels, const ELowEntryImageFormat ImageFormat, TArray<uint8>& ByteArray, const int32 CompressionQuality = 0);
+	
+	
+	/**
+	* Converts the pixel to an accurate-looking gray pixel.
+	*
+	* The formula it uses:  brightness  =  21.25% red  +  71.54% green  +  7.21% blue
+	*/
+	UFUNCTION(BlueprintPure, Category = "Low Entry|Extended Standard Library|Image|Other", Meta = (DisplayName = "Grayscale Pixel", Keywords = "to convert grey get"))
+		static FColor GrayscalePixel(const FColor& Pixel);
+
+	/**
+	* Converts the pixels to accurate-looking gray pixels.
+	*
+	* The formula it uses:  brightness  =  21.25% red  +  71.54% green  +  7.21% blue
+	*/
+	UFUNCTION(BlueprintPure, Category = "Low Entry|Extended Standard Library|Image|Other", Meta = (DisplayName = "Grayscale Pixels", Keywords = "to convert grey get"))
+		static TArray<FColor> GrayscalePixels(const TArray<FColor>& Pixel);
 
 
 	/**
@@ -2444,6 +2461,20 @@ public:
 
 
 	/**
+	* Gets the window border size.
+	* Useful for when you want to set the window's position while still showing the border as well.
+	*
+	* Returns Success=false if the window bounds could not be determined, which happends when:
+	*  - GEngine is null
+	*  - GEngine's GameViewportClient is null
+	*  - GameViewportClient's Window is null
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Utilities|Window", Meta = (DisplayName = "Get Window Border Size", Keywords = "margin padding"))
+		static void GetWindowBorderSize(bool& Success, FMargin& Margin);
+
+
+
+	/**
 	* Returns the window mode. 
 	* 
 	* If Fullscreen is false then IsFullscreenWindowed will also be false.
@@ -2514,6 +2545,20 @@ public:
 	*/
 	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Utilities|Viewport", Meta = (DisplayName = "Set World Rendering Enabled", Keywords = "disable game 3d view"))
 		static void SetWorldRenderingEnabled(const bool Enabled);
+
+
+
+	/**
+	* Retrieves and returns the clipboard's content.
+	*/
+	UFUNCTION(BlueprintPure, Category = "Low Entry|Extended Standard Library|Utilities|Clipboard", Meta = (DisplayName = "Clipboard Get", Keywords = "paste retrieve obtain access"))
+		static FString ClipboardGet();
+
+	/**
+	* Sets the given string as the clipboard's content.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Low Entry|Extended Standard Library|Utilities|Clipboard", Meta = (DisplayName = "Clipboard Set", Keywords = "copy put place"))
+		static void ClipboardSet(const FString& Value);
 
 
 

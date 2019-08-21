@@ -43,6 +43,8 @@
 #include "Misc/Base64.h"
 #include "Internationalization/Regex.h"
 
+#include "HAL/PlatformApplicationMisc.h"
+
 #include "GenericPlatform/GenericApplication.h"
 
 #include "GameMapsSettings.h"
@@ -1772,6 +1774,23 @@ void ULowEntryExtendedStandardLibrary::PixelsToBytes(const int32 Width, const in
 
 		ByteArray = ImageWrapper->GetCompressed(CompressionQuality);
 	}
+}
+
+
+FColor ULowEntryExtendedStandardLibrary::GrayscalePixel(const FColor& Pixel)
+{
+	uint8 Gray = (uint8)FMath::RoundToDouble((0.2125 * Pixel.R) + (0.7154 * Pixel.G) + (0.0721 * Pixel.B));
+	return FColor(Gray, Gray, Gray, Pixel.A);
+}
+
+TArray<FColor> ULowEntryExtendedStandardLibrary::GrayscalePixels(const TArray<FColor>& Pixels)
+{
+	TArray<FColor> Result;
+	for(FColor Pixel : Pixels)
+	{
+		Result.Add(GrayscalePixel(Pixel));
+	}
+	return Result;
 }
 
 
@@ -4037,9 +4056,7 @@ void ULowEntryExtendedStandardLibrary::SetWindowPosition(const int32 X, const in
 		return;
 	}
 
-	FMargin BorderSize = Window->GetWindowBorderSize(true);
-
-	Window->MoveWindowTo(FVector2D(FMath::Max(BorderSize.Left, ((float) X)), FMath::Max(BorderSize.Top, ((float) Y))));
+	Window->MoveWindowTo(FVector2D((float) X, (float) Y));
 }
 
 void ULowEntryExtendedStandardLibrary::SetWindowSize(const int32 Width, const int32 Height)
@@ -4094,9 +4111,37 @@ void ULowEntryExtendedStandardLibrary::SetWindowPositiomInPercentagesCentered(co
 	float NewScreenX = ScreenX + (ScreenWidth * X) - (WindowSize.X / 2.0f);
 	float NewScreenY = ScreenY + (ScreenHeight * Y) - (WindowSize.Y / 2.0f);
 
+	Window->MoveWindowTo(FVector2D(NewScreenX, NewScreenY));
+}
+
+
+
+void ULowEntryExtendedStandardLibrary::GetWindowBorderSize(bool& Success, FMargin& Margin)
+{
+	Success = false;
+	Margin = FMargin();
+
+	if(GEngine == nullptr)
+	{
+		return;
+	}
+
+	UGameViewportClient* ViewportClient = GEngine->GameViewport;
+	if(ViewportClient == nullptr)
+	{
+		return;
+	}
+
+	TSharedPtr<SWindow> Window = ViewportClient->GetWindow();
+	if(!Window.IsValid())
+	{
+		return;
+	}
+
 	FMargin BorderSize = Window->GetWindowBorderSize(true);
 
-	Window->MoveWindowTo(FVector2D(FMath::Max(BorderSize.Left, NewScreenX), FMath::Max(BorderSize.Top, NewScreenY)));
+	Success = true;
+	Margin = BorderSize;
 }
 
 
@@ -4289,6 +4334,20 @@ void ULowEntryExtendedStandardLibrary::SetWorldRenderingEnabled(const bool Enabl
 	}
 
 	ViewportClient->bDisableWorldRendering = (Enabled ? 0 : 1);
+}
+
+
+
+FString ULowEntryExtendedStandardLibrary::ClipboardGet()
+{
+	FString Value = TEXT("");
+	FPlatformApplicationMisc::ClipboardPaste(Value);
+	return Value;
+}
+
+void ULowEntryExtendedStandardLibrary::ClipboardSet(const FString& Value)
+{
+	FPlatformApplicationMisc::ClipboardCopy(*Value);
 }
 
 
